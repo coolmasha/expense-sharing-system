@@ -3,6 +3,7 @@ package com.mashakulabukhova.expensesharingsystem.presentation.screen.authorizat
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.mashakulabukhova.expensesharingsystem.data.local.UserManager
 import com.mashakulabukhova.expensesharingsystem.data.remote.model.LoginRequest
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.domain.usecase.authentication.LoginUseCase
@@ -53,15 +54,23 @@ class LoginViewModel @Inject constructor(
     fun login() {
         if (!isFormValid()) return
 
-        val loginRequest = LoginRequest(_emailState.value.trim(), _passwordState.value.trim())
-        Log.d("LoginViewModel", "Login: $loginRequest")
+        UserManager.login(
+            User(
+                "1",
+                "Masha",
+                "masha"
+            )
+        )
 
-        viewModelScope.launch {
-            _state.value = LoginState.Loading
-            val result = loginUseCase.invoke(loginRequest)
-            Log.d("LoginViewModel", "Result: $result")
-            processNetworkResult(result)
-        }
+//        val loginRequest = LoginRequest(_emailState.value.trim(), _passwordState.value.trim())
+//        Log.d("LoginViewModel", "Login: $loginRequest")
+//
+//        viewModelScope.launch {
+//            _state.value = LoginState.Loading
+//            val result = loginUseCase.invoke(loginRequest)
+//            Log.d("LoginViewModel", "Result: $result")
+//            processNetworkResult(result)
+//        }
     }
 
     private fun clearFields() {

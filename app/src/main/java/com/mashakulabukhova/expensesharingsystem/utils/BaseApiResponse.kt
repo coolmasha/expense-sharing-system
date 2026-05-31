@@ -1,6 +1,7 @@
 package com.mashakulabukhova.expensesharingsystem.utils
 
 import android.util.Log
+import com.mashakulabukhova.expensesharingsystem.domain.entity.Event
 import retrofit2.Response
 
 class BaseApiResponse {
@@ -16,7 +17,7 @@ class BaseApiResponse {
                 val body = response.body()
                 body?.let {
                     NetworkResult.Success(mapper(body))
-                } ?: NetworkResult.Error(message = "Body is empty")
+                } ?: NetworkResult.Error(message = "Ошибка загрузки")
             } else {
                 NetworkResult.Error(
                     code = response.code(),
@@ -25,7 +26,7 @@ class BaseApiResponse {
             }
         } catch (e: Exception) {
             Log.d("BaseApiResponse", "Exception: $e")
-            NetworkResult.Error(message = e.message ?: "Unknown error")
+            NetworkResult.Error(message = e.message ?: "Ошибка загрузки")
         }
     }
 
@@ -41,8 +42,26 @@ class BaseApiResponse {
                 body?.let { wrapper ->
                     extractor(wrapper)?.let { extractedData ->
                         NetworkResult.Success(extractedData)
-                    } ?: NetworkResult.Error(message = "Failed to extract data from wrapper")
-                } ?: NetworkResult.Error(message = "Body is empty")
+                    } ?: NetworkResult.Error(message = "Ошибка загрузки")
+                } ?: NetworkResult.Error(message = "Ошибка загрузки")
+            } else {
+                NetworkResult.Error(
+                    code = response.code(),
+                    message = response.message()
+                )
+            }
+        } catch (e: Exception) {
+            Log.d("BaseApiResponse", "Exception: $e")
+            NetworkResult.Error(message = e.message ?: "Ошибка загрузки")
+        }
+    }
+
+    suspend fun safeApiCallNoBody(api: suspend() -> Response<Void>): NetworkResult<Unit> {
+        return try {
+            val response = api()
+            Log.d("BaseApiResponse", "Response: $response")
+            if (response.isSuccessful) {
+                NetworkResult.Success(Unit)
             } else {
                 NetworkResult.Error(
                     code = response.code(),
@@ -54,20 +73,4 @@ class BaseApiResponse {
             NetworkResult.Error(message = e.message ?: "Unknown error")
         }
     }
-//
-//    suspend fun safeApiCallNoBody(api: suspend() -> Response<Void>): NetworkResult<Unit> {
-//        return try {
-//            val response = api()
-//            if (response.isSuccessful) {
-//                NetworkResult.Success(Unit)
-//            } else {
-//                errorMessage("${response.code()} ${response.message()}")
-//            }
-//        } catch (e: Exception) {
-//            errorMessage(e.message.toString())
-//        }
-//    }
-//
-//    private fun <T> errorMessage(e: String): NetworkResult.Error<T> =
-//        NetworkResult.Error(message = "Api call failed: ${e}")
 }

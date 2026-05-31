@@ -1,8 +1,9 @@
 package com.mashakulabukhova.expensesharingsystem.domain.entity
 
 data class Event(
-    val id: Int,
+    val id: String,
     val title: String,
-    val creatorId: Int,
+    val category: String,
+    val creatorId: String,
     val isFinished: Boolean
 )

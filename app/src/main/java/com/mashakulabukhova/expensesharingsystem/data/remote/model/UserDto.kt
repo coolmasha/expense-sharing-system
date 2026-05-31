@@ -1,16 +1,14 @@
 package com.mashakulabukhova.expensesharingsystem.data.remote.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 data class UserDto(
-    @SerialName("user_id")
+    @SerializedName("user_id")
     val id: String,
-    @SerialName("username")
+    @SerializedName("username")
     val username: String,
-    @SerialName("name")
+    @SerializedName("name")
     val name: String,
-    @SerialName("email")
+    @SerializedName("email")
     val email: String
 )

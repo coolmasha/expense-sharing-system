@@ -1,6 +1,11 @@
 package com.mashakulabukhova.expensesharingsystem.data.remote.model
 
+import com.google.gson.annotations.SerializedName
+
+
 data class LoginRequest(
-    val email: String,
+    @SerializedName("login")
+    val login: String,
+    @SerializedName("password")
     val password: String
 )

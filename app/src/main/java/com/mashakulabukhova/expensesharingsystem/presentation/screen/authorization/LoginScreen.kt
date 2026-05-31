@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
@@ -23,13 +22,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -44,11 +39,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mashakulabukhova.expensesharingsystem.R
-import com.mashakulabukhova.expensesharingsystem.presentation.component.VerticalGradientButton
+import com.mashakulabukhova.expensesharingsystem.presentation.component.PrimaryTextField
+import com.mashakulabukhova.expensesharingsystem.presentation.component.PrimaryButton
 import com.mashakulabukhova.expensesharingsystem.presentation.ui.theme.ExpenseSharingSystemTheme
-import com.mashakulabukhova.expensesharingsystem.presentation.ui.theme.Grey500
-import com.mashakulabukhova.expensesharingsystem.presentation.ui.theme.Red200
-import com.mashakulabukhova.expensesharingsystem.presentation.ui.theme.Red800
 
 @Preview
 @Composable
@@ -101,7 +94,7 @@ fun LoginScreen(
                 Text(
                     text = "Авторизация",
                     color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.displayMedium
+                    style = MaterialTheme.typography.headlineMedium
                 )
             }
             Column(
@@ -115,53 +108,32 @@ fun LoginScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     val hasError = emailError != null
-                    val placeholderColor = when {
-                        hasError -> MaterialTheme.colorScheme.onError
-                        else -> Grey500
-                    }
                     Text(
                         text = "Логин",
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
-//                    Surface(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        shadowElevation = 4.dp,
-//                        shape = RoundedCornerShape(50.dp)
-//                    ) {
-                        OutlinedTextField(
-                            value = email,
-                            onValueChange = { viewModel.updateEmail(it) },
-                            modifier = Modifier.fillMaxWidth(),
-                            textStyle = MaterialTheme.typography.bodySmall,
-                            placeholder = { Text("mari@mail.ru", color = placeholderColor) },
-                            isError = hasError,
-                            supportingText = {
-                                if (hasError) {
-                                    Text(
-                                        text = emailError!!,
-                                        color = MaterialTheme.colorScheme.onError,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            },
-                            shape = RoundedCornerShape(50.dp),
-                            colors = TextFieldDefaults.colors(
-                                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                                focusedContainerColor = MaterialTheme.colorScheme.background,
-                                focusedIndicatorColor = Grey500,
-
-                                unfocusedTextColor = Grey500,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                                unfocusedIndicatorColor = Grey500,
-
-                                errorTextColor = MaterialTheme.colorScheme.onError,
-                                errorContainerColor = MaterialTheme.colorScheme.errorContainer,
-                                errorIndicatorColor = MaterialTheme.colorScheme.onError,
+                    PrimaryTextField(
+                        value = email,
+                        onValueChange = { viewModel.updateEmail(it) },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = {
+                            Text(
+                                "mari@mail.ru",
+                                style = MaterialTheme.typography.bodyMedium
                             )
-                        )
-//                    }
+                        },
+                        isError = hasError,
+                        supportingText = {
+                            if (hasError) {
+                                Text(
+                                    text = emailError!!,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    )
                 }
 
                 Column(
@@ -170,88 +142,54 @@ fun LoginScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     val hasError = passwordError != null
-                    val placeholderColor = when {
-                        hasError -> MaterialTheme.colorScheme.onError
-                        else -> Grey500
-                    }
-
-                    val iconColor = when {
-                        hasError -> MaterialTheme.colorScheme.onError
-                        else -> Grey500
-                    }
-
-                    val iconBackgroundColor = when {
-                        hasError -> MaterialTheme.colorScheme.errorContainer
-                        else -> MaterialTheme.colorScheme.background
-                    }
 
                     Text(
                         text = "Пароль",
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
-//                    Surface(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        shadowElevation = 4.dp,
-//                        shape = RoundedCornerShape(50.dp)
-//                    ) {
-                        OutlinedTextField(
-                            value = password,
-                            onValueChange = { viewModel.updatePassword(it) },
-                            modifier = Modifier.fillMaxWidth(),
-                            textStyle = MaterialTheme.typography.bodySmall,
-                            placeholder = { Text("password123", color = placeholderColor) },
-                            visualTransformation = if (passwordVisible)
-                                VisualTransformation.None
-                            else
-                                PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                            trailingIcon = {
-                                val image = if (passwordVisible) {
-                                    Icons.Outlined.Visibility
-                                } else {
-                                    Icons.Outlined.VisibilityOff
-                                }
-
-                                IconButton(
-                                    onClick = { viewModel.updatePasswordVisible() },
-                                    colors = IconButtonDefaults.iconButtonColors(
-                                        contentColor = iconColor,
-                                        containerColor = iconBackgroundColor
-                                    )
-                                ) {
-                                    Icon(
-                                        imageVector = image, contentDescription = null
-                                    )
-                                }
-                            },
-                            isError = hasError,
-                            supportingText = {
-                                if (hasError) {
-                                    Text(
-                                        text = passwordError!!,
-                                        color = MaterialTheme.colorScheme.onError,
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
-                            },
-                            shape = RoundedCornerShape(50.dp),
-                            colors = TextFieldDefaults.colors(
-                                focusedTextColor = MaterialTheme.colorScheme.onBackground,
-                                focusedContainerColor = MaterialTheme.colorScheme.background,
-                                focusedIndicatorColor = Grey500,
-
-                                unfocusedTextColor = Grey500,
-                                unfocusedContainerColor = MaterialTheme.colorScheme.background,
-                                unfocusedIndicatorColor = Grey500,
-
-                                errorTextColor = MaterialTheme.colorScheme.onError,
-                                errorContainerColor = MaterialTheme.colorScheme.errorContainer,
-                                errorIndicatorColor = MaterialTheme.colorScheme.onError,
+                    PrimaryTextField(
+                        value = password,
+                        onValueChange = { viewModel.updatePassword(it) },
+                        modifier = Modifier.fillMaxWidth(),
+                        placeholder = {
+                            Text(
+                                "password123",
+                                style = MaterialTheme.typography.bodyMedium
                             )
-                        )
-//                    }
+                        },
+                        visualTransformation = if (passwordVisible)
+                            VisualTransformation.None
+                        else
+                            PasswordVisualTransformation(),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                        trailingIcon = {
+                            val image = if (passwordVisible) {
+                                Icons.Outlined.Visibility
+                            } else {
+                                Icons.Outlined.VisibilityOff
+                            }
+
+                            IconButton(
+                                onClick = { viewModel.updatePasswordVisible() }
+                            ) {
+                                Icon(
+                                    imageVector = image,
+                                    contentDescription = null
+                                )
+                            }
+                        },
+                        isError = hasError,
+                        supportingText = {
+                            if (hasError) {
+                                Text(
+                                    text = passwordError!!,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
+                        }
+                    )
                 }
 
                 Row(
@@ -270,7 +208,7 @@ fun LoginScreen(
                     Text(
                         text = "Запомнить пароль",
                         color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 
@@ -282,7 +220,7 @@ fun LoginScreen(
                 ) {
                     Text(
                         text = "Забыли пароль?", color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodyMedium
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
@@ -291,15 +229,15 @@ fun LoginScreen(
                             .clickable {
                                 onPasswordRecoveryClick()
                             },
-                        color = MaterialTheme.colorScheme.tertiary,
+                        color = MaterialTheme.colorScheme.secondary,
                         textDecoration = TextDecoration.Underline,
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.bodyMedium
                     )
                 }
 
             }
 
-            VerticalGradientButton(
+            PrimaryButton(
                 onClick = {
                     viewModel.login()
                 },
@@ -322,13 +260,13 @@ fun LoginScreen(
                 Text(
                     text = "Нет аккаунта?",
                     color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodyMedium
                 )
                 OutlinedButton(
                     onClick = onRegistrationClick,
                     modifier = Modifier
                         .width(IntrinsicSize.Min)
-                        .height(56.dp),
+                        .height(IntrinsicSize.Min),
 //                        .shadow(
 //                            elevation = 4.dp, // высота тени
 //                            shape = RoundedCornerShape(50.dp), // форма должна совпадать с формой кнопки

@@ -31,25 +31,65 @@ class RegistrationViewModel : ViewModel() {
     private val _passwordCheckVisibleState: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val passwordCheckVisibleState = _passwordCheckVisibleState.asStateFlow()
 
-    fun updateUsername(newValue: String) = _usernameState.update { newValue }
+    private val _usernameError = MutableStateFlow<String?>(null)
+    val usernameError = _usernameError.asStateFlow()
 
-    fun updateEmail(newValue: String) = _emailState.update { newValue }
+    private val _emailError = MutableStateFlow<String?>(null)
+    val emailError = _emailError.asStateFlow()
 
-    fun updatePassword(newValue: String) = _passwordState.update { newValue }
+    private val _passwordError = MutableStateFlow<String?>(null)
+    val passwordError = _passwordError.asStateFlow()
+
+    private val _passwordCheckError = MutableStateFlow<String?>(null)
+    val passwordCheckError = _passwordCheckError.asStateFlow()
+
+    fun updateUsername(newValue: String){
+        _usernameError.update { null }
+        _usernameState.update { newValue }
+    }
+
+    fun updateEmail(newValue: String){
+        _emailError.update { null }
+        _emailState.update { newValue }
+    }
+
+    fun updatePassword(newValue: String){
+        _passwordState.update { newValue }
+
+        if (_passwordCheckState.value != _passwordState.value) {
+            _passwordError.update {
+                "Пароли не совпадают"
+            }
+            _passwordCheckError.update {
+                "Пароли не совпадают"
+            }
+        } else {
+            _passwordError.update {
+                null
+            }
+            _passwordCheckError.update {
+                null
+            }
+        }
+    }
 
     fun updatePasswordCheck(newValue: String) {
         _passwordCheckState.update { newValue }
 
-        Log.d(
-            "RegistrationViewModel",
-            "Comparison: ${_passwordState.value} - ${_passwordCheckState.value}"
-        )
         if (_passwordCheckState.value != _passwordState.value) {
-            Log.d("RegistrationViewModel", "Comparison: Eror")
-            setError("Пароли не совпадают")
+            _passwordError.update {
+                "Пароли не совпадают"
+            }
+            _passwordCheckError.update {
+                "Пароли не совпадают"
+            }
         } else {
-            Log.d("RegistrationViewModel", "Comparison: Initial")
-            _registrationState.value = RegistrationState.Initial
+            _passwordError.update {
+                null
+            }
+            _passwordCheckError.update {
+                null
+            }
         }
     }
 
@@ -58,33 +98,51 @@ class RegistrationViewModel : ViewModel() {
     fun updatePasswordCheckVisible() = _passwordCheckVisibleState.update { !_passwordCheckVisibleState.value }
 
     private fun isFormValid(): Boolean {
-        return when {
-            _usernameState.value.isBlank() -> {
-                setError("Введите username")
-                false
-            }
-            _emailState.value.isBlank() -> {
-                setError("Введите почту")
-                false
-            }
-            _passwordState.value.isBlank() -> {
-                setError("Введите пароль")
-                false
-            }
-            _passwordCheckState.value.isBlank() -> {
-                setError("Повторите пароль")
-                false
-            }
-            _passwordCheckState.value != _passwordState.value -> {
-                setError("Пароли не совпадают")
-                false
-            }
-            else -> true
+        val isUsernameValid = _emailState.value.isNotBlank()
+        val isEmailValid = _emailState.value.isNotBlank()
+        val isPasswordValid = _passwordState.value.isNotBlank()
+        val isPasswordCheckValid = _passwordCheckState.value.isNotBlank()
+
+        val equal = _passwordCheckState.value == _passwordState.value
+
+
+        _usernameError.update {
+            if (isUsernameValid) null else "Введите username"
         }
+
+        _emailError.update {
+            if (isEmailValid) null else "Введите почту"
+        }
+
+        if (isPasswordValid && isPasswordCheckValid) {
+            if (!equal) {
+                _passwordError.update {
+                    "Пароли не совпадают"
+                }
+                _passwordCheckError.update {
+                    "Пароли не совпадают"
+                }
+            }
+        } else {
+            _passwordError.update {
+                if (isPasswordValid) null else "Введите пароль"
+            }
+
+            _passwordCheckError.update {
+                if (isPasswordCheckValid) null else "Повторите пароль"
+            }
+        }
+
+
+        return isUsernameValid && isEmailValid && isPasswordValid && isPasswordCheckValid && equal
     }
 
     private fun setError(message: String){
         _registrationState.value = RegistrationState.Error(message)
+    }
+
+    fun registration() {
+        isFormValid()
     }
 }
 

@@ -13,13 +13,30 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    background = White,
-    onBackground = Black,
+
     primary = Blue400,
     onPrimary = White,
-    secondary = Grey100,
+    primaryContainer = White,
+    onPrimaryContainer = Black,
+
+    secondary = Blue300,
     onSecondary = White,
-    tertiary = Blue300,
+    secondaryContainer = Blue200,
+
+    tertiary = Grey100,
+    onTertiary = White,
+
+    background = White,
+    onBackground = Black,
+
+    surface = White,
+    onSurface = Grey100,
+    onSurfaceVariant = Grey500,
+
+    surfaceTint = Blue100,
+
+    outline = White,
+
 
 
     error = Red200,

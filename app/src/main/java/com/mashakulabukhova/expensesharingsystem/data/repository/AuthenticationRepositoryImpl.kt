@@ -3,6 +3,7 @@ package com.mashakulabukhova.expensesharingsystem.data.repository
 import com.mashakulabukhova.expensesharingsystem.data.mapper.toUser
 import com.mashakulabukhova.expensesharingsystem.data.remote.AuthenticationRemoteDataSource
 import com.mashakulabukhova.expensesharingsystem.data.remote.model.LoginRequest
+import com.mashakulabukhova.expensesharingsystem.data.remote.model.RegistrationRequest
 import com.mashakulabukhova.expensesharingsystem.data.remote.model.UserDto
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.domain.repository.AuthenticationRepository
@@ -18,6 +19,13 @@ class AuthenticationRepositoryImpl @Inject constructor(
     override suspend fun login(body: LoginRequest): NetworkResult<User> {
         return baseApiResponse.safeApiCall(
             api = { authenticationRemoteDataSource.login(body) },
+            mapper = { userDto: UserDto -> userDto.toUser() }
+        )
+    }
+
+    override suspend fun registration(body: RegistrationRequest): NetworkResult<User> {
+        return baseApiResponse.safeApiCall(
+            api = { authenticationRemoteDataSource.registration(body) },
             mapper = { userDto: UserDto -> userDto.toUser() }
         )
     }

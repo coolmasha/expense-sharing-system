@@ -20,13 +20,13 @@ import androidx.compose.ui.tooling.preview.Preview
 @Preview
 @Composable
 fun Testtt() {
-    VerticalGradientButton({}) {
+    PrimaryButton({}) {
         Text("deeve")
     }
 }
 
 @Composable
-fun VerticalGradientButton(
+fun PrimaryButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -36,7 +36,7 @@ fun VerticalGradientButton(
     contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
     interactionSource: MutableInteractionSource? = null,
     gradientColor1: Color = MaterialTheme.colorScheme.primary,
-    gradientColor2: Color = MaterialTheme.colorScheme.tertiary,
+    gradientColor2: Color = MaterialTheme.colorScheme.secondary,
     content: @Composable (RowScope.() -> Unit)
 ) {
 
