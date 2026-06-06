@@ -1,10 +1,10 @@
 package com.mashakulabukhova.expensesharingsystem.data.remote
 
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.EventRequestDto
-import com.mashakulabukhova.expensesharingsystem.domain.entity.EventRequest
+import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.EventRequestDto
+import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.ParticipantsRequestDto
 import retrofit2.Response
+import retrofit2.http.Body
 import javax.inject.Inject
-import kotlin.uuid.Uuid
 
 class EventRemoteDataSource @Inject constructor(
     private val eventService: EventService
@@ -16,4 +16,8 @@ class EventRemoteDataSource @Inject constructor(
     suspend fun putEvent(event_id: String, body: EventRequestDto)= eventService.putEvent(event_id = event_id, body = body)
     suspend fun patchEvent(event_id: String, body: EventRequestDto) = eventService.patchEvent(event_id = event_id, body = body)
     suspend fun deleteEvent(event_id: String): Response<Void> = eventService.deleteEvent(event_id = event_id)
+
+    suspend fun postParticipants(body: ParticipantsRequestDto) = eventService.postParticipants(body = body)
+    suspend fun getMyEvents() = eventService.getMyEvents()
+    suspend fun getParticipants(event_id: String) = eventService.getParticipants(event_id = event_id)
 }

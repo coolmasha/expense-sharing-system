@@ -5,8 +5,9 @@ import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 
 fun UserDto.toUser(): User {
     return User(
-        id = this.id,
+        id = this.user_id,
         username = this.username,
         email = this.email,
+        status = this.status
     )
 }

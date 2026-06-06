@@ -3,6 +3,7 @@ package com.mashakulabukhova.expensesharingsystem.domain.usecase.friends
 import com.mashakulabukhova.expensesharingsystem.domain.entity.Event
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.domain.repository.EventRepository
+import com.mashakulabukhova.expensesharingsystem.domain.repository.FriendRepository
 import com.mashakulabukhova.expensesharingsystem.utils.NetworkResult
 import javax.inject.Inject
 
@@ -20,10 +21,14 @@ private val users = listOf(
 )
 
 class GetAllFriendsUseCase @Inject constructor(
+    private val friendRepository: FriendRepository
 ) {
 
-    suspend operator fun invoke(userId: String): NetworkResult<List<User>> {
+    suspend operator fun invoke(): NetworkResult<List<User>> {
+//        return friendRepository.getAllFriends(userId)
+        return friendRepository.getAllFriends()
+
 //        return NetworkResult.Success(result = users)
-        return NetworkResult.Success(result = emptyList())
+//        return NetworkResult.Success(result = emptyList())
     }
 }

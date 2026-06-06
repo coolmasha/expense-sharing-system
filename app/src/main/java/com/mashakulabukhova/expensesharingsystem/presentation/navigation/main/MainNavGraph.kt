@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mashakulabukhova.expensesharingsystem.presentation.navigation.EventsNavGraph
+import com.mashakulabukhova.expensesharingsystem.presentation.navigation.FriendsNavGraph
 import com.mashakulabukhova.expensesharingsystem.presentation.screen.event.EventsScreen
 import com.mashakulabukhova.expensesharingsystem.presentation.screen.friends.FriendsScreen
 import com.mashakulabukhova.expensesharingsystem.presentation.screen.profile.ProfileScreen
@@ -32,7 +34,7 @@ fun MainNavGraph() {
             startDestination = "event_screen"
         ) {
             composable("event_screen") {
-                EventsScreen(Modifier
+                EventsNavGraph(Modifier
                     .padding(
                         start = 16.dp,
                         top = innerPadding.calculateTopPadding() + 24.dp,
@@ -41,8 +43,8 @@ fun MainNavGraph() {
                     ))
             }
             composable("friends_screen") {
-                FriendsScreen(
-                    Modifier
+                FriendsNavGraph(
+                    modifier = Modifier
                         .padding(
                             start = 16.dp,
                             top = innerPadding.calculateTopPadding() + 24.dp,
@@ -50,8 +52,6 @@ fun MainNavGraph() {
                             bottom = innerPadding.calculateBottomPadding()
                         )
                 )
-            }
-            composable("expenses_screen") {
             }
             composable("profile_screen") {
                 ProfileScreen(Modifier

@@ -3,7 +3,7 @@ package com.mashakulabukhova.expensesharingsystem.presentation.screen.event
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mashakulabukhova.expensesharingsystem.domain.entity.Event
-import com.mashakulabukhova.expensesharingsystem.domain.usecase.event.GetAllEventsUseCase
+import com.mashakulabukhova.expensesharingsystem.domain.usecase.event.GetMyEventsUseCase
 import com.mashakulabukhova.expensesharingsystem.utils.NetworkResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,17 +15,21 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EventsViewModel @Inject constructor(
-    private val getAllEventsUseCase: GetAllEventsUseCase
+    private val getMyEventsUseCase: GetMyEventsUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<EventsState>(EventsState.Loading)
 
     val state = _state.asStateFlow()
 
+    init {
+        getAllEvents()
+    }
+
     fun getAllEvents() {
         viewModelScope.launch {
             _state.update { EventsState.Loading }
-            getAllEventsUseCase.invoke(userId = "UserManager.currentUser.user_id").let {
+            getMyEventsUseCase.invoke().let {
                 processNetworkResult(it)
             }
         }

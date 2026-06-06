@@ -56,6 +56,46 @@ class BaseApiResponse {
         }
     }
 
+    suspend fun <T> safeApiCallWithoutBody(
+        api: suspend () -> Response<T>
+    ): NetworkResult<Unit> {
+        return try {
+            val response = api()
+            Log.d("BaseApiResponse", "Response: $response")
+            if (response.isSuccessful) {
+                NetworkResult.Success(Unit)
+            } else {
+                NetworkResult.Error(
+                    code = response.code(),
+                    message = response.message()
+                )
+            }
+        } catch (e: Exception) {
+            Log.d("BaseApiResponse", "Exception: $e")
+            NetworkResult.Error(message = e.message ?: "Ошибка загрузки")
+        }
+    }
+
+    suspend fun safeApiCallIgnoreBody(
+        api: suspend () -> Response<Unit>
+    ): NetworkResult<Unit> {
+        return try {
+            val response = api()
+            Log.d("BaseApiResponse", "Response: $response")
+            if (response.isSuccessful) {
+                NetworkResult.Success(Unit)
+            } else {
+                NetworkResult.Error(
+                    code = response.code(),
+                    message = response.message()
+                )
+            }
+        } catch (e: Exception) {
+            Log.d("BaseApiResponse", "Exception: $e")
+            NetworkResult.Error(message = e.message ?: "Ошибка загрузки")
+        }
+    }
+
     suspend fun safeApiCallNoBody(api: suspend() -> Response<Void>): NetworkResult<Unit> {
         return try {
             val response = api()

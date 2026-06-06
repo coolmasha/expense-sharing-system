@@ -1,5 +1,5 @@
 package com.mashakulabukhova.expensesharingsystem.domain.entity
 
-data class EventRequest(
-    val title: String
+data class Amount(
+    val amount: Double
 )

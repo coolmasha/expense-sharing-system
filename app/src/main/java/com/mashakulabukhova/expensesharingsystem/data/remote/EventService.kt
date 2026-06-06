@@ -1,7 +1,9 @@
 package com.mashakulabukhova.expensesharingsystem.data.remote
 
 import com.mashakulabukhova.expensesharingsystem.data.remote.model.EventDto
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.EventRequestDto
+import com.mashakulabukhova.expensesharingsystem.data.remote.model.UserDto
+import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.EventRequestDto
+import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.ParticipantsRequestDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -13,14 +15,25 @@ import retrofit2.http.Path
 
 interface EventService {
 
+    @POST("events")
+    suspend fun postEvent(@Body body: EventRequestDto): Response<EventDto>
+
+    @POST("participants")
+    suspend fun postParticipants(@Body body: ParticipantsRequestDto): Response<Unit>
+
+    @GET("events")
+    suspend fun getMyEvents(): Response<List<EventDto>>
+
+    @GET("participants/{event_id}")
+    suspend fun getParticipants(@Path("event_id") event_id: String): Response<List<UserDto>>
+
+
     @GET("events/{user_id}")
     suspend fun getAllEvents(@Path("user_id") user_id: String): Response<List<EventDto>>
 
-    @GET("events/single/{id}")
+    @GET("events/{id}")
     suspend fun getEvent(@Path("id") event_id: String): Response<EventDto>
 
-    @POST("events")
-    suspend fun postEvent(@Body body: EventRequestDto): Response<EventDto>
 
     @PUT("events/{event_id}")
     suspend fun putEvent(

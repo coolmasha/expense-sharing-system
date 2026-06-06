@@ -1,7 +1,7 @@
 package com.mashakulabukhova.expensesharingsystem.domain.repository
 
 import com.mashakulabukhova.expensesharingsystem.domain.entity.Event
-import com.mashakulabukhova.expensesharingsystem.domain.entity.EventRequest
+import com.mashakulabukhova.expensesharingsystem.domain.entity.request.EventRequest
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.utils.NetworkResult
 import kotlinx.coroutines.flow.Flow
@@ -15,4 +15,9 @@ interface EventRepository {
     suspend fun putEvent(event_id: String, body: EventRequest): NetworkResult<Event>
     suspend fun patchEvent(event_id: String, body: EventRequest): NetworkResult<Event>
     suspend fun deleteEvent(event_id: String): NetworkResult<Unit>
+
+    suspend fun createEventWithoutBody(body: EventRequest): NetworkResult<Unit>
+    suspend fun getMyEvents(): NetworkResult<List<Event>>
+
+    suspend fun getParticipants(event_id: String): NetworkResult<List<User>>
 }

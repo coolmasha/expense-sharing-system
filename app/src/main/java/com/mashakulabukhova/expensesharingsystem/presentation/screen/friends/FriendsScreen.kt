@@ -1,6 +1,9 @@
 package com.mashakulabukhova.expensesharingsystem.presentation.screen.friends
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -12,18 +15,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -32,18 +33,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import coil3.compose.AsyncImage
-import com.mashakulabukhova.expensesharingsystem.di.ApiModule
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.presentation.component.ErrorMessage
 import com.mashakulabukhova.expensesharingsystem.presentation.component.LoadingIndicator
@@ -57,11 +52,20 @@ fun FriendsScreen(
 ) {
 
     val state = viewModel.state.collectAsState().value
+    val actionState = viewModel.actionState.collectAsState().value
+
     val userList by viewModel.userList.collectAsState()
+    val friendList by viewModel.friendList.collectAsState()
+    val incomingRequests by viewModel.incomingRequests.collectAsState()
+    val sentRequests by viewModel.sentRequests.collectAsState()
+
     val searchQuery by viewModel.searchQuery.collectAsState()
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    var isSearchMode by remember { mutableStateOf(false) }
+    BackHandler() {
+        viewModel.clearSearch()
+        keyboardController?.hide()
+    }
 
     PrimaryGradient(modifier)
     Column(
@@ -73,14 +77,15 @@ fun FriendsScreen(
         Text(
             text = "Друзья",
             modifier = Modifier
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.headlineMedium
         )
         SecondaryTextField(
             value = searchQuery,
-            onValueChange = {viewModel.onSearchQueryUpdate(it)},
+            onValueChange = { viewModel.onSearchQueryUpdate(it) },
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(
@@ -106,7 +111,6 @@ fun FriendsScreen(
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(
                 onSearch = {
-                    isSearchMode = true
                     viewModel.onSearchTriggered()
                     keyboardController?.hide()
                 }
@@ -114,33 +118,73 @@ fun FriendsScreen(
             singleLine = true
         )
 
+        when (actionState) {
+            is ActionState.Init -> {
+                FriendsView(
+                    friendList = friendList,
+                    onFriendClick = { viewModel.deleteFriend(it) },
+                    incomingRequests = incomingRequests,
+                    sentRequests = sentRequests,
+                    state = state,
+                    onFriendsClick = { viewModel.getAllFriends() },
+                    onIncomingRequestsClick = { viewModel.getIncomingRequests() },
+                    onSentRequestsClick = {
+                        viewModel.getOutgoingRequests()
+                    },
+                    onAcceptClick = { viewModel.acceptFriendshipRequest(it) },
+                    onRejectClick = { viewModel.rejectFriendshipRequest(it) },
+                    onCancelClick = { viewModel.cancelFriendshipRequest(it) }
+                )
+            }
+
+            is ActionState.Search -> {
+                SearchResultsView(
+                    userList = userList,
+                    onUserClick = { viewModel.sendFriendshipRequest(it) },
+                    state = state
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SearchResultsView(
+    userList: List<User>,
+    onUserClick: (String) -> Unit,
+    state: FriendsState = FriendsState.Loading
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text(
-            text = if (isSearchMode) "Результаты поиска" else "Мои друзья",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp),
+            text = "Результаты поиска",
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Start,
             style = MaterialTheme.typography.titleLarge
         )
-
         when (state) {
             is FriendsState.Error -> {
-                ErrorMessage(Modifier.fillMaxSize(),
-                    state.message)
+                ErrorMessage(
+                    Modifier.fillMaxSize(),
+                    state.message
+                )
             }
+
             is FriendsState.Loading -> {
                 LoadingIndicator(Modifier.fillMaxSize())
             }
+
             is FriendsState.Success -> {
                 if (userList.isEmpty()) {
-                    EmptyState(
+                    EmptySearchState(
                         modifier = Modifier.fillMaxSize(),
-                        message = if (isSearchMode) "Ничего не найдено" else "У вас пока нет друзей"
+                        message = "Ничего не найдено"
                     )
                 } else {
                     UserList(
-                        userList = userList
+                        userList = userList,
+                        onUserClick = onUserClick
                     )
                 }
             }
@@ -148,75 +192,281 @@ fun FriendsScreen(
     }
 }
 
+
 @Composable
-fun UserList(
-    userList: List<User>
+fun FriendsView(
+    friendList: List<User>,
+    onFriendClick: (String) -> Unit,
+    incomingRequests: List<User>,
+    sentRequests: List<User>,
+    state: FriendsState = FriendsState.Loading,
+    onFriendsClick: () -> Unit,
+    onIncomingRequestsClick: () -> Unit,
+    onSentRequestsClick: () -> Unit,
+    onAcceptClick: (String) -> Unit,
+    onRejectClick: (String) -> Unit,
+    onCancelClick: (String) -> Unit
 ) {
 
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    var isIncomingRequestsMode by remember { mutableStateOf(false) }
+    var isSentRequestsMode by remember { mutableStateOf(false) }
 
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(4.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            items(
-                items = userList,
-                key = { friend -> friend.id }
-            ) { friend ->
-                UserCard(friend)
+            TextButton(
+                onClick = {
+                    onFriendsClick()
+                    isIncomingRequestsMode = false
+                }
+            ) {
+                Text(
+                    text = "Мои друзья",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+            TextButton(
+                onClick = {
+                    onIncomingRequestsClick()
+                    isIncomingRequestsMode = true
+                }
+            ) {
+                Text(
+                    text = "Заявки",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
+
+        }
+
+        if (isIncomingRequestsMode) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(
+                    onClick = {
+                        onIncomingRequestsClick()
+                        isSentRequestsMode = false
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(50.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        containerColor = if (isSentRequestsMode)
+                            MaterialTheme.colorScheme.primaryContainer
+                        else
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 4.dp
+                    ),
+                    border = BorderStroke(
+                        width = 4.dp,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                ) {
+                    Text(
+                        text = "Входящие",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.Start,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+                TextButton(
+                    onClick = {
+                        onSentRequestsClick()
+                        isSentRequestsMode = true
+                    },
+                    modifier = Modifier.weight(1f),
+                    shape = RoundedCornerShape(50.dp),
+                    colors = ButtonDefaults.textButtonColors(
+                        containerColor = if (isSentRequestsMode)
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                        else
+                            MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 4.dp
+                    ),
+                    border = BorderStroke(
+                        width = 4.dp,
+                        color = MaterialTheme.colorScheme.primaryContainer
+                    )
+                ) {
+                    Text(
+                        text = "Отправленные",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        textAlign = TextAlign.End,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            }
+        }
+
+        when (state) {
+            is FriendsState.Error -> {
+                ErrorMessage(
+                    Modifier.fillMaxSize(),
+                    state.message
+                )
+            }
+
+            is FriendsState.Loading -> {
+                LoadingIndicator(Modifier.fillMaxSize())
+            }
+
+            is FriendsState.Success -> {
+                if (!isIncomingRequestsMode) {
+                    if (friendList.isEmpty()) {
+                        EmptyState(
+                            modifier = Modifier.fillMaxSize(),
+                            message = "У вас пока нет друзей"
+                        )
+                    } else {
+                        FriendList(
+                            userList = friendList,
+                            onUserClick = onFriendClick
+                        )
+                    }
+                } else {
+                    if (!isSentRequestsMode) {
+                        if (incomingRequests.isEmpty()) {
+                            EmptyState(
+                                modifier = Modifier.fillMaxSize(),
+                                message = "У вас нет входящих заявок в друзья"
+                            )
+                        } else {
+                            IncomingRequestList(incomingRequests, onAcceptClick, onRejectClick)
+                        }
+                    } else {
+                        if (sentRequests.isEmpty()) {
+                            EmptyState(
+                                modifier = Modifier.fillMaxSize(),
+                                message = "У вас нет отправленных заявок в друзья"
+                            )
+                        } else {
+                            SentRequestList(sentRequests, onCancelClick)
+                        }
+                    }
+                }
+
             }
         }
     }
 }
 
 @Composable
-fun UserCard(
-    user: User
+fun IncomingRequestList(
+    incomingRequests: List<User>,
+    onAcceptClick: (String) -> Unit,
+    onRejectClick: (String) -> Unit
 ) {
-    Card(
+    LazyColumn(
         modifier = Modifier
             .fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = (MaterialTheme.colorScheme.primaryContainer),
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-    )
+        contentPadding = PaddingValues(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            AsyncImage(
-//                model = ApiModule.getBaseUrl() + "upload/" + UserManager.currentUser.id,
-                model = ApiModule.getBaseUrl() + "upload/",
-                contentDescription = "Аватар",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape),
-                placeholder = rememberVectorPainter(Icons.Filled.AccountCircle),
-                error = rememberVectorPainter(Icons.Filled.AccountCircle),
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
-            )
-            Text(
-                text = user.username,
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                style = MaterialTheme.typography.titleSmall
-            )
+        items(
+            items = incomingRequests,
+            key = { user -> user.id }
+        ) { user ->
+            IncomingRequestCard(user, onAcceptClick, onRejectClick)
         }
+    }
+}
 
+@Composable
+fun SentRequestList(
+    sentRequests: List<User>,
+    onCancelClick: (String) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxWidth(),
+        contentPadding = PaddingValues(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(
+            items = sentRequests,
+            key = { user -> user.id }
+        ) { user ->
+            SentRequestCard(user, onCancelClick)
+        }
+    }
+}
+
+
+@Composable
+fun UserList(
+    userList: List<User>,
+    onUserClick: (String) -> Unit
+) {
+
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(
+            items = userList,
+            key = { friend -> friend.id }
+        ) { friend ->
+            UserCard(friend, onUserClick)
+        }
+    }
+}
+
+@Composable
+fun FriendList(
+    userList: List<User>,
+    onUserClick: (String) -> Unit
+) {
+
+    LazyColumn(
+        modifier = Modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(
+            items = userList,
+            key = { friend -> friend.id }
+        ) { friend ->
+            FriendCard(friend, onUserClick)
+        }
     }
 }
 
 @Composable
 fun EmptyState(modifier: Modifier = Modifier, message: String) {
+    Box(
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+    }
+}
+
+
+@Composable
+fun EmptySearchState(modifier: Modifier = Modifier, message: String) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -225,14 +475,14 @@ fun EmptyState(modifier: Modifier = Modifier, message: String) {
         Icon(
             imageVector = Icons.Outlined.Search,
             contentDescription = null,
-            modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
+            modifier = Modifier.size(48.dp),
+            tint = MaterialTheme.colorScheme.onBackground
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }

@@ -1,7 +1,7 @@
 package com.mashakulabukhova.expensesharingsystem.domain.usecase.event
 
 import com.mashakulabukhova.expensesharingsystem.domain.entity.Event
-import com.mashakulabukhova.expensesharingsystem.domain.entity.EventRequest
+import com.mashakulabukhova.expensesharingsystem.domain.entity.request.EventRequest
 import com.mashakulabukhova.expensesharingsystem.domain.repository.EventRepository
 import com.mashakulabukhova.expensesharingsystem.utils.NetworkResult
 import javax.inject.Inject

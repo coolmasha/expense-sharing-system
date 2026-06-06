@@ -1,7 +1,7 @@
 package com.mashakulabukhova.expensesharingsystem.domain.repository
 
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.LoginRequest
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.RegistrationRequest
+import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.LoginRequest
+import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.RegistrationRequest
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.utils.NetworkResult
 

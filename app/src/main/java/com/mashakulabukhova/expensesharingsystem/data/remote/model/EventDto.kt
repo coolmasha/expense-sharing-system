@@ -3,14 +3,15 @@ package com.mashakulabukhova.expensesharingsystem.data.remote.model
 import com.google.gson.annotations.SerializedName
 
 data class EventDto(
-    @SerializedName("event_id")
+    @SerializedName(value = "event_id",
+        alternate = ["eventId", "id"])
     val id: String,
-    @SerializedName("title")
+    @SerializedName("eventName")
     val title: String,
-    @SerializedName("category")
-    val category: String,
+    @SerializedName("iconId")
+    val iconId: String = "0",
     @SerializedName("creatorId")
-    val creatorId: String,
-    @SerializedName("isFinished")
-    val isFinished: Boolean
+    val creatorId: String = "",
+    @SerializedName("finished")
+    val isFinished: Boolean = false
 )

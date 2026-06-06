@@ -20,7 +20,7 @@ fun LoadingIndicator(
         contentAlignment = Alignment.Center
     ) {
         CircularProgressIndicator(
-            color = MaterialTheme.colorScheme.secondary,
+            color = MaterialTheme.colorScheme.background,
             strokeCap = StrokeCap.Round
         )
     }

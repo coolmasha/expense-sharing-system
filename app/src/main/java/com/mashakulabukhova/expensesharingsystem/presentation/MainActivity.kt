@@ -29,18 +29,15 @@ class MainActivity : ComponentActivity() {
             ExpenseSharingSystemTheme {
                 val isLoggedIn by userManager.isLoggedInState.collectAsState()
 
-                MainNavGraph()
-//                if (isLoggedIn) {
-//                    MainNavGraph()
-//                } else {
-//                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-////                    VerticalGradientButton({}, modifier = Modifier.padding(innerPadding)) {
-////                        Text("evev")
-////                    }
-//                        AuthorizationNavGraph(modifier = Modifier
-//                            .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding()))
-//                    }
-//                }
+//                MainNavGraph()
+                if (isLoggedIn) {
+                    MainNavGraph()
+                } else {
+                    Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                        AuthorizationNavGraph(modifier = Modifier
+                            .padding(top = innerPadding.calculateTopPadding(), bottom = innerPadding.calculateBottomPadding()))
+                    }
+                }
 
             }
         }

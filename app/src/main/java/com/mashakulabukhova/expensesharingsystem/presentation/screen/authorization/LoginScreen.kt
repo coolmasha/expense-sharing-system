@@ -4,6 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,15 +32,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mashakulabukhova.expensesharingsystem.R
+import com.mashakulabukhova.expensesharingsystem.presentation.component.LoadingIndicator
 import com.mashakulabukhova.expensesharingsystem.presentation.component.PrimaryTextField
 import com.mashakulabukhova.expensesharingsystem.presentation.component.PrimaryButton
 import com.mashakulabukhova.expensesharingsystem.presentation.ui.theme.ExpenseSharingSystemTheme
@@ -60,12 +65,13 @@ fun LoginScreen(
     onRegistrationClick: () -> Unit
 ) {
 
-    val state = viewModel.state.collectAsState()
+    val state = viewModel.state.collectAsState().value
     val email by viewModel.emailState.collectAsState()
     val password by viewModel.passwordState.collectAsState()
     val passwordVisible by viewModel.passwordVisibleState.collectAsState()
     val emailError by viewModel.emailError.collectAsState()
     val passwordError by viewModel.passwordError.collectAsState()
+
 
     Column(
         modifier = modifier
@@ -100,7 +106,7 @@ fun LoginScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Column(
                     modifier = Modifier
@@ -192,47 +198,76 @@ fun LoginScreen(
                     )
                 }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Checkbox(
-                        checked = false,
-                        onCheckedChange = {},
-                        modifier = Modifier
-                            .size(24.dp)
-                    )
-                    Text(
-                        text = "Запомнить пароль",
-                        color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(start = 16.dp),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+//                ) {
+//                    Checkbox(
+//                        checked = false,
+//                        onCheckedChange = {},
+//                        modifier = Modifier
+//                            .size(24.dp)
+//                    )
+//                    Text(
+//                        text = "Запомнить пароль",
+//                        color = MaterialTheme.colorScheme.onBackground,
+//                        style = MaterialTheme.typography.bodyMedium
+//                    )
+//                }
+//
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(start = 16.dp),
+////                    horizontalArrangement = Arrangement.Center
+//                ) {
+//                    Text(
+//                        text = "Забыли пароль?", color = MaterialTheme.colorScheme.onBackground,
+//                        style = MaterialTheme.typography.bodyMedium
+//                    )
+//                    Spacer(Modifier.width(8.dp))
+//                    Text(
+//                        text = "Восстановить ",
+//                        modifier = Modifier
+//                            .clickable {
+//                                onPasswordRecoveryClick()
+//                            },
+//                        color = MaterialTheme.colorScheme.secondary,
+//                        textDecoration = TextDecoration.Underline,
+//                        style = MaterialTheme.typography.bodyMedium
+//                    )
+//                }
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 16.dp),
-//                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Забыли пароль?", color = MaterialTheme.colorScheme.onBackground,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = "Восстановить ",
-                        modifier = Modifier
-                            .clickable {
-                                onPasswordRecoveryClick()
-                            },
-                        color = MaterialTheme.colorScheme.secondary,
-                        textDecoration = TextDecoration.Underline,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                when (state) {
+                    is LoginState.Authorized -> {}
+                    is LoginState.Error -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = state.message,
+                                color = MaterialTheme.colorScheme.primary,
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                    is LoginState.Initial -> {}
+                    is LoginState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeCap = StrokeCap.Round
+                            )
+                        }
+                    }
                 }
 
             }

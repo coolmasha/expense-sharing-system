@@ -1,6 +1,6 @@
 package com.mashakulabukhova.expensesharingsystem.domain.usecase.authentication
 
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.LoginRequest
+import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.LoginRequest
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.domain.repository.AuthenticationRepository
 import com.mashakulabukhova.expensesharingsystem.utils.NetworkResult

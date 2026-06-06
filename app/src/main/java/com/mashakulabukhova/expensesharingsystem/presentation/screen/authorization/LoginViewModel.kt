@@ -1,10 +1,11 @@
 package com.mashakulabukhova.expensesharingsystem.presentation.screen.authorization
 
 import android.util.Log
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mashakulabukhova.expensesharingsystem.data.local.UserManager
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.LoginRequest
+import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.LoginRequest
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.domain.usecase.authentication.LoginUseCase
 import com.mashakulabukhova.expensesharingsystem.utils.NetworkResult
@@ -40,8 +41,15 @@ class LoginViewModel @Inject constructor(
     val passwordError = _passwordError.asStateFlow()
 
     fun updateEmail(newValue: String) {
-        _emailError.update { null }
         _emailState.update { newValue }
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(_emailState.value.trim()).matches()) {
+            _emailError.update {
+                "Введите корректный email"
+            }
+        } else {
+            _emailError.update { null }
+        }
     }
 
     fun updatePassword(newValue: String) {
@@ -54,23 +62,15 @@ class LoginViewModel @Inject constructor(
     fun login() {
         if (!isFormValid()) return
 
-        UserManager.login(
-            User(
-                "1",
-                "Masha",
-                "masha"
-            )
-        )
+        val loginRequest = LoginRequest(_emailState.value.trim(), _passwordState.value.trim())
+        Log.d("LoginViewModel", "Login: $loginRequest")
 
-//        val loginRequest = LoginRequest(_emailState.value.trim(), _passwordState.value.trim())
-//        Log.d("LoginViewModel", "Login: $loginRequest")
-//
-//        viewModelScope.launch {
-//            _state.value = LoginState.Loading
-//            val result = loginUseCase.invoke(loginRequest)
-//            Log.d("LoginViewModel", "Result: $result")
-//            processNetworkResult(result)
-//        }
+        viewModelScope.launch {
+            _state.value = LoginState.Loading
+            val result = loginUseCase.invoke(loginRequest)
+            Log.d("LoginViewModel", "Result: $result")
+            processNetworkResult(result)
+        }
     }
 
     private fun clearFields() {
@@ -81,23 +81,32 @@ class LoginViewModel @Inject constructor(
 
     private fun isFormValid(): Boolean {
         val isEmailValid = _emailState.value.isNotBlank()
+        val isEmailMatch = Patterns.EMAIL_ADDRESS.matcher(_emailState.value.trim()).matches()
         val isPasswordValid = _passwordState.value.isNotBlank()
 
         _emailError.update {
-            if (isEmailValid) null else "Введите почту или username"
+            if (isEmailValid) {
+                if (isEmailMatch) {
+                    null
+                } else {
+                    "Введите корректный email"
+                }
+            } else {
+                "Введите почту или username"
+            }
         }
 
         _passwordError.update {
             if (isPasswordValid) null else "Введите пароль"
         }
 
-        return isEmailValid && isPasswordValid
+        return isEmailValid && isEmailMatch && isPasswordValid
     }
 
     private fun processNetworkResult(networkResult: NetworkResult<User>) {
         when (networkResult) {
             is NetworkResult.Error -> {
-                setError(networkResult.message)
+                setError("Не удалось войти в приложение. Попробуйте позже")
             }
 
             is NetworkResult.Loading -> {
@@ -106,6 +115,7 @@ class LoginViewModel @Inject constructor(
 
             is NetworkResult.Success -> {
                 _state.value = LoginState.Authorized(networkResult.result)
+                UserManager.login(userCurrent = networkResult.result)
             }
         }
     }

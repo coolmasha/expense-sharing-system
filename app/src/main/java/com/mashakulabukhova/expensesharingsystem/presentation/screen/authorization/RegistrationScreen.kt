@@ -3,6 +3,7 @@ package com.mashakulabukhova.expensesharingsystem.presentation.screen.authorizat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,6 +16,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -28,12 +30,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mashakulabukhova.expensesharingsystem.R
 import com.mashakulabukhova.expensesharingsystem.presentation.component.PrimaryButton
@@ -53,11 +58,11 @@ fun Test1() {
 @Composable
 fun RegistrationScreen(
     modifier: Modifier = Modifier,
-    viewModel: RegistrationViewModel = viewModel(),
+    viewModel: RegistrationViewModel = hiltViewModel(),
     onBackClick: () -> Unit
 ) {
 
-    val state = viewModel.registrationState.collectAsState()
+    val state = viewModel.registrationState.collectAsState().value
     val username by viewModel.usernameState.collectAsState()
     val email by viewModel.emailState.collectAsState()
     val password by viewModel.passwordState.collectAsState()
@@ -80,7 +85,7 @@ fun RegistrationScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Column(
@@ -104,7 +109,7 @@ fun RegistrationScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Text(
                     text = "Имя пользователя",
@@ -250,21 +255,41 @@ fun RegistrationScreen(
                         }
                     }
                 )
-                val currentState = state.value
-                if (currentState is RegistrationState.Error) {
-                    Text(
-                        text = currentState.message,
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(horizontal = 16.dp)
-                    )
+
+                when (state) {
+                    is RegistrationState.Error -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = state.message,
+                                color = MaterialTheme.colorScheme.primary,
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.bodySmall
+                            )
+                        }
+                    }
+                    is RegistrationState.Initial -> {}
+                    is RegistrationState.Loading -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = MaterialTheme.colorScheme.primary,
+                                strokeCap = StrokeCap.Round
+                            )
+                        }
+                    }
+                    is RegistrationState.Registered -> {}
                 }
             }
 
             Column(
                 modifier = Modifier
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 PrimaryButton(

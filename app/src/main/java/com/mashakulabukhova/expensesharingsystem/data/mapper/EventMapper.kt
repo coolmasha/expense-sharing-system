@@ -9,7 +9,7 @@ fun EventDto.toEvent(): Event {
     return Event(
         id = this.id,
         title = this.title,
-        category = this.category,
+        iconId = this.iconId.toIntOrNull() ?: 0,
         creatorId = this.creatorId,
         isFinished = this.isFinished,
     )
