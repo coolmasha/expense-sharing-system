@@ -1,4 +1,4 @@
-package com.mashakulabukhova.expensesharingsystem.presentation.screen.event
+package com.mashakulabukhova.expensesharingsystem.presentation.screen.event.add
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

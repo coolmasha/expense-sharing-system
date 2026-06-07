@@ -1,12 +1,15 @@
-package com.mashakulabukhova.expensesharingsystem.presentation.screen.event
+package com.mashakulabukhova.expensesharingsystem.presentation.screen.event.eventlist
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -18,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mashakulabukhova.expensesharingsystem.R
 import com.mashakulabukhova.expensesharingsystem.domain.entity.Event
@@ -87,6 +91,93 @@ fun EventItem(
 
     }
 }
+
+@Composable
+fun EventCard(
+    event: Event,
+    userListSize: Int
+) {
+    Card(
+        modifier = Modifier
+            .width(320.dp)
+            .wrapContentHeight(),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = (MaterialTheme.colorScheme.primaryContainer),
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 4.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(12.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Icon(
+                painter = painterResource(transformIconIdToDrawable(event.iconId)),
+                contentDescription = "Category Icon",
+                modifier = Modifier
+                    .size(64.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = event.title,
+//                text = "event.titless dkvnjdvdw vjlvvkev evljenlkvev levnlkdmvklwev lvnkpevmdmv pdvmpVOV VNkdvmlVD",
+                modifier = Modifier
+                    .padding(top = 4.dp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleMedium
+            )
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(top = 8.dp),
+//                horizontalArrangement = Arrangement.SpaceBetween,
+//                verticalAlignment = Alignment.CenterVertically
+//            ) {
+//                Text(
+//                    text = "Валюта:",
+//                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+//                    textAlign = TextAlign.Center,
+//                    style = MaterialTheme.typography.titleSmall
+//                )
+//                Text(
+//                    text = event.currency,
+//                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+//                    textAlign = TextAlign.Center,
+//                    style = MaterialTheme.typography.bodyMedium
+//                )
+//            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Количество участников:",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    text = "$userListSize",
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+        }
+    }
+}
+
 
 
 fun iconForEventCategory(category: String): Int {

@@ -1,9 +1,11 @@
-package com.mashakulabukhova.expensesharingsystem.presentation.screen.event
+package com.mashakulabukhova.expensesharingsystem.presentation.screen.event.add
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,18 +16,17 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PersonAdd
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -50,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -60,6 +62,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.presentation.component.PrimaryGradient
 import com.mashakulabukhova.expensesharingsystem.presentation.component.SecondaryTextField
+import com.mashakulabukhova.expensesharingsystem.presentation.ui.theme.Green300
+import com.mashakulabukhova.expensesharingsystem.presentation.ui.theme.Red700
 
 
 @Composable
@@ -258,23 +262,36 @@ fun AddEventScreen(
 
                 DropdownMenu(
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    availableIcons.forEach { icon ->
-                        DropdownMenuItem(
-                            text = {
-                                Icon(
-                                    painter = painterResource(id = icon.id),
-                                    contentDescription = icon.name,
-                                    modifier = Modifier.size(40.dp),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            },
-                            onClick = {
-                                viewModel.updateIconId(icon.id)
-                                expanded = false
-                            }
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier
+                        .background(
+                            MaterialTheme.colorScheme.background
                         )
+                        .width(88.dp)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 280.dp)
+                            .verticalScroll(rememberScrollState()),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        availableIcons.forEach { icon ->
+                            DropdownMenuItem(
+                                text = {
+                                    Icon(
+                                        painter = painterResource(id = icon.id),
+                                        contentDescription = icon.name,
+                                        modifier = Modifier.size(40.dp),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                },
+                                onClick = {
+                                    viewModel.updateIconId(icon.id)
+                                    expanded = false
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -291,94 +308,13 @@ fun AddEventScreen(
                 textStyle = MaterialTheme.typography.bodyMedium,
                 placeholder = {
                     Text(
-                        text = "Поиск",
+                        text = "Название",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
             )
         }
 
-//        Text(
-//            text = "Настройки",
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(start = 16.dp, top = 8.dp),
-//            color = MaterialTheme.colorScheme.onBackground,
-//            textAlign = TextAlign.Start,
-//            style = MaterialTheme.typography.titleMedium
-//        )
-//        Box(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//        ) {
-//            Button(
-//                onClick = { currencyExpanded = true },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(48.dp),
-//                shape = RoundedCornerShape(20.dp),
-//                colors = ButtonDefaults.buttonColors(
-//                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-//                    contentColor = MaterialTheme.colorScheme.primary
-//                ),
-//                elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
-//            ) {
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceBetween
-//                ) {
-//                    Text(
-//                        text = "Валюта",
-//                        color = MaterialTheme.colorScheme.onBackground,
-//                        style = MaterialTheme.typography.bodyMedium
-//                    )
-//                    Text(
-//                        text = selectedCurrency?.name ?: "Валюта",
-//                        color = MaterialTheme.colorScheme.onBackground,
-//                        style = MaterialTheme.typography.bodyMedium
-//                    )
-//                }
-//
-//            }
-//
-//            DropdownMenu(
-//                expanded = currencyExpanded,
-//                onDismissRequest = { currencyExpanded = false }
-//            ) {
-//                availableCurrencies.forEach { currency ->
-//                    DropdownMenuItem(
-//                        text = {
-//                            Row(
-//                                modifier = Modifier.fillMaxWidth(),
-//                                horizontalArrangement = Arrangement.SpaceBetween,
-//                                verticalAlignment = Alignment.CenterVertically
-//                            ) {
-//                                Text(
-//                                    text = currency.symbol,
-//                                    color = MaterialTheme.colorScheme.primary,
-//                                    style = MaterialTheme.typography.bodyLarge
-//                                )
-//                                Text(
-//                                    text = currency.name,
-//                                    color = MaterialTheme.colorScheme.primary,
-//                                    style = MaterialTheme.typography.bodyMedium
-//                                )
-//                                Text(
-//                                    text = currency.code,
-//                                    color = MaterialTheme.colorScheme.primary,
-//                                    style = MaterialTheme.typography.bodySmall
-//                                )
-//                            }
-//                        },
-//                        onClick = {
-//                            viewModel.updateCurrency(currency.name)
-//                            currencyExpanded = false
-//                        }
-//                    )
-//                }
-//            }
-//        }
 
         Text(
             text = "Участники",
@@ -417,7 +353,6 @@ fun AddEventScreen(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
 
         ) {
-
             Button(
                 onClick = onBackClick,
                 modifier = Modifier
@@ -461,7 +396,6 @@ fun AddEventScreen(
                     style = MaterialTheme.typography.labelMedium
                 )
             }
-
         }
     }
 
@@ -496,17 +430,18 @@ fun AddFriendToEvent(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 8.dp),
+                .padding(vertical = 4.dp, horizontal = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = Icons.Default.PersonAdd,
+                imageVector = Icons.Default.Add,
                 contentDescription = "Add Person",
                 modifier = Modifier
                     .size(40.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
+            Spacer(Modifier.width(4.dp))
             Text(
                 text = "Добавить участника",
                 modifier = Modifier,

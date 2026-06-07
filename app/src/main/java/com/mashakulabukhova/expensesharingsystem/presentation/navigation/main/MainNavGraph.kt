@@ -11,8 +11,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.mashakulabukhova.expensesharingsystem.presentation.navigation.EventsNavGraph
 import com.mashakulabukhova.expensesharingsystem.presentation.navigation.FriendsNavGraph
-import com.mashakulabukhova.expensesharingsystem.presentation.screen.event.EventsScreen
-import com.mashakulabukhova.expensesharingsystem.presentation.screen.friends.FriendsScreen
 import com.mashakulabukhova.expensesharingsystem.presentation.screen.profile.ProfileScreen
 
 @Composable

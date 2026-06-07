@@ -1,4 +1,4 @@
-package com.mashakulabukhova.expensesharingsystem.data.remote.model.request
+package com.mashakulabukhova.expensesharingsystem.data.model.request
 
 import com.google.gson.annotations.SerializedName
 

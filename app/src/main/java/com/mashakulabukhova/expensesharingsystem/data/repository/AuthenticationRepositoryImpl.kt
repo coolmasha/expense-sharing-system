@@ -4,9 +4,9 @@ import android.util.Log
 import com.mashakulabukhova.expensesharingsystem.data.local.TokenManager
 import com.mashakulabukhova.expensesharingsystem.data.mapper.toUser
 import com.mashakulabukhova.expensesharingsystem.data.remote.AuthenticationRemoteDataSource
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.LoginRequest
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.RegistrationRequest
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.UserDto
+import com.mashakulabukhova.expensesharingsystem.data.model.request.LoginRequest
+import com.mashakulabukhova.expensesharingsystem.data.model.request.RegistrationRequest
+import com.mashakulabukhova.expensesharingsystem.data.model.UserDto
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.domain.repository.AuthenticationRepository
 import com.mashakulabukhova.expensesharingsystem.utils.BaseApiResponse

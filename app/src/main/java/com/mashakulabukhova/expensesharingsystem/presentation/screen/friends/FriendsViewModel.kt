@@ -2,7 +2,7 @@ package com.mashakulabukhova.expensesharingsystem.presentation.screen.friends
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.FriendRequest
+import com.mashakulabukhova.expensesharingsystem.data.model.request.FriendRequest
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.domain.usecase.friends.DeleteFriendUseCase
 import com.mashakulabukhova.expensesharingsystem.domain.usecase.friends.GetAllFriendsUseCase

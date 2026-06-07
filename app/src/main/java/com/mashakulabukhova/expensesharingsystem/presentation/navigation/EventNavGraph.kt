@@ -7,10 +7,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.mashakulabukhova.expensesharingsystem.presentation.screen.event.AddEventScreen
-import com.mashakulabukhova.expensesharingsystem.presentation.screen.event.EventDetailScreen
-import com.mashakulabukhova.expensesharingsystem.presentation.screen.event.EventsScreen
-import com.mashakulabukhova.expensesharingsystem.presentation.screen.friends.FriendProfileScreen
+import com.mashakulabukhova.expensesharingsystem.presentation.screen.event.add.AddEventScreen
+import com.mashakulabukhova.expensesharingsystem.presentation.screen.event.detail.EventDetailScreen
+import com.mashakulabukhova.expensesharingsystem.presentation.screen.event.eventlist.EventsScreen
+import com.mashakulabukhova.expensesharingsystem.presentation.screen.expenses.AddExpenseScreen
 
 @Composable
 fun EventsNavGraph(
@@ -47,7 +47,24 @@ fun EventsNavGraph(
 
             EventDetailScreen(
                 modifier = modifier,
-                eventId = eventId
+                eventId = eventId,
+                onAddExpense = {
+                    navController.navigate("add_new_expense/$eventId")
+                }
+            )
+        }
+        composable(
+            route = "add_new_expense/{eventId}",
+            arguments = listOf(navArgument("eventId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val eventId = backStackEntry.arguments?.getString("eventId") ?: ""
+
+            AddExpenseScreen(
+                modifier = modifier,
+                eventId = eventId,
+                onBackClick = {
+                    navController.navigate("event_detail_screen/$eventId")
+                }
             )
         }
     }

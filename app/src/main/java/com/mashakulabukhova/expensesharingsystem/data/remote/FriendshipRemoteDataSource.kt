@@ -1,6 +1,6 @@
 package com.mashakulabukhova.expensesharingsystem.data.remote
 
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.FriendRequest
+import com.mashakulabukhova.expensesharingsystem.data.model.request.FriendRequest
 import javax.inject.Inject
 
 class FriendshipRemoteDataSource @Inject constructor(

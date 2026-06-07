@@ -1,8 +1,9 @@
-package com.mashakulabukhova.expensesharingsystem.presentation.screen.event
+package com.mashakulabukhova.expensesharingsystem.presentation.screen.event.detail
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,16 +13,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -29,47 +28,41 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import coil3.compose.AsyncImage
-import com.mashakulabukhova.expensesharingsystem.data.local.UserManager
-import com.mashakulabukhova.expensesharingsystem.di.ApiModule
-import com.mashakulabukhova.expensesharingsystem.domain.entity.Event
 import com.mashakulabukhova.expensesharingsystem.domain.entity.Expense
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.presentation.component.ErrorMessage
 import com.mashakulabukhova.expensesharingsystem.presentation.component.LoadingIndicator
 import com.mashakulabukhova.expensesharingsystem.presentation.component.PrimaryGradient
-import com.mashakulabukhova.expensesharingsystem.utils.transformIconIdToDrawable
+import com.mashakulabukhova.expensesharingsystem.presentation.screen.event.eventlist.EventCard
 
 @Composable
 fun EventDetailScreen(
     modifier: Modifier = Modifier,
     eventId: String,
-    viewModel: EventDetailViewModel = hiltViewModel()
+    viewModel: EventDetailViewModel = hiltViewModel(),
+    onAddExpense: () -> Unit
 ) {
 
     val state = viewModel.state.collectAsState().value
     val event by viewModel.event.collectAsState()
     val participants by viewModel.participants.collectAsState()
+    val expenses by viewModel.expenses.collectAsState()
+
+    val myExpenseAmount by viewModel.myExpenseAmount.collectAsState()
+    val allExpenseAmount by viewModel.allExpenseAmount.collectAsState()
 
     val buttonState = viewModel.buttonState.collectAsState().value
 
 
     LaunchedEffect(Unit) {
-        viewModel.getEvent(eventId)
-        viewModel.getParticipants(eventId)
+        viewModel.getEventRequest(eventId)
+        viewModel.getParticipantsRequest(eventId)
+        viewModel.getAllExpensesRequest(eventId)
     }
 
     PrimaryGradient(modifier)
@@ -190,7 +183,13 @@ fun EventDetailScreen(
             }
 
             is ButtonState.Expense -> {
-                ExpensesView()
+                ExpensesView(
+                    expenses = expenses,
+                    myExpenseAmount = myExpenseAmount,
+                    allExpenseAmount = allExpenseAmount,
+                    onExpenseDelete = {viewModel.deleteExpense(it)},
+                    onAddExpense = onAddExpense
+                )
             }
 
             is ButtonState.Participants -> {
@@ -223,65 +222,12 @@ fun ParticipantsView(
 }
 
 @Composable
-fun ParticipantsItem(
-    participant: User
-) {
-
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = (MaterialTheme.colorScheme.primaryContainer),
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.AccountCircle,
-                contentDescription = "Person",
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.secondary
-            )
-            if (participant.id == UserManager.currentUser.id) {
-                Row(
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = participant.username,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        style = MaterialTheme.typography.titleSmall
-                    )
-                    Text(
-                        text = " (Я)",
-                        color = MaterialTheme.colorScheme.secondary,
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-
-            } else {
-                Text(
-                    text = participant.username,
-                    modifier = Modifier.weight(1f),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    style = MaterialTheme.typography.titleSmall
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun ExpensesView(
-
+    expenses: List<Expense>,
+    myExpenseAmount: Long,
+    allExpenseAmount: Long,
+    onExpenseDelete: (String) -> Unit,
+    onAddExpense: () -> Unit
 ) {
 
     Column(
@@ -318,7 +264,7 @@ fun ExpensesView(
 
                     )
                     Text(
-                        text = "1880,00" + " ₽",
+                        text = "${myExpenseAmount}" + " ₽",
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium
                     )
@@ -350,164 +296,81 @@ fun ExpensesView(
 
                     )
                     Text(
-                        text = "1880,00" + " ₽",
+                        text = "${allExpenseAmount}" + " ₽",
                         color = MaterialTheme.colorScheme.onBackground,
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
             }
         }
-        LazyColumn() { }
-    }
-
-}
-
-@Composable
-fun ExpenseItem(
-    expense: Expense
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = (MaterialTheme.colorScheme.primaryContainer),
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
-        )
-    ) {
-        Row(
+        LazyColumn(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            contentPadding = PaddingValues(vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Column(
-
-            ) {
-                Text(
-                    text = expense.title,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = "оплачено" + expense.payerUsername,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleMedium
+            items(
+                items = expenses,
+                key = {expense -> expense.id}
+            ) { expense ->
+                ExpenseItem(
+                    expense = expense,
+                    onExpenseDelete = onExpenseDelete
                 )
             }
-
-            Row(
-
-            ) {
-                Text(
-                    text = expense.amount + " ₽",
-                    color = MaterialTheme.colorScheme.onBackground,
-                    style = MaterialTheme.typography.titleMedium
+            item {
+                AddExpenseButton(
+                    addNewExpense = onAddExpense
                 )
-
-                IconButton(
-                    onClick = { }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Удалить",
-                        modifier = Modifier.size(32.dp),
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
             }
         }
     }
 }
+
+
 
 @Composable
 fun BalancesView() {
 
 }
 
+
 @Composable
-fun EventCard(
-    event: Event,
-    userListSize: Int
+fun AddExpenseButton(
+    addNewExpense: () -> Unit
 ) {
-    Card(
+    Button(
+        onClick = addNewExpense,
         modifier = Modifier
-            .width(320.dp)
-            .wrapContentHeight(),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
+
+        colors = ButtonDefaults.buttonColors(
             containerColor = (MaterialTheme.colorScheme.primaryContainer),
         ),
-        elevation = CardDefaults.cardElevation(
+        elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 4.dp
         )
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(vertical = 8.dp, horizontal = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                painter = painterResource(transformIconIdToDrawable(event.iconId)),
-                contentDescription = "Category Icon",
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add Event",
                 modifier = Modifier
-                    .size(64.dp),
+                    .size(40.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = event.title,
-//                text = "event.titless dkvnjdvdw vjlvvkev evljenlkvev levnlkdmvklwev lvnkpevmdmv pdvmpVOV VNkdvmlVD",
-                modifier = Modifier
-                    .padding(top = 4.dp),
+                text = "Добавить расход",
+                modifier = Modifier,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.titleMedium
             )
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(top = 8.dp),
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text(
-//                    text = "Валюта:",
-//                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-//                    textAlign = TextAlign.Center,
-//                    style = MaterialTheme.typography.titleSmall
-//                )
-//                Text(
-//                    text = event.currency,
-//                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-//                    textAlign = TextAlign.Center,
-//                    style = MaterialTheme.typography.bodyMedium
-//                )
-//            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Количество участников:",
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.titleSmall
-                )
-                Text(
-                    text = "$userListSize",
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
         }
     }
 }

@@ -2,8 +2,8 @@ package com.mashakulabukhova.expensesharingsystem.data.repository
 
 import com.mashakulabukhova.expensesharingsystem.data.mapper.toUser
 import com.mashakulabukhova.expensesharingsystem.data.remote.FriendshipRemoteDataSource
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.FriendRequest
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.UserDto
+import com.mashakulabukhova.expensesharingsystem.data.model.request.FriendRequest
+import com.mashakulabukhova.expensesharingsystem.data.model.UserDto
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.domain.repository.FriendshipRepository
 import com.mashakulabukhova.expensesharingsystem.utils.BaseApiResponse

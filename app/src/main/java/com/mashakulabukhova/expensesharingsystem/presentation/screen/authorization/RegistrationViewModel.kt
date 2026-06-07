@@ -5,7 +5,7 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mashakulabukhova.expensesharingsystem.data.local.UserManager
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.RegistrationRequest
+import com.mashakulabukhova.expensesharingsystem.data.model.request.RegistrationRequest
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.domain.usecase.authentication.RegistrationUseCase
 import com.mashakulabukhova.expensesharingsystem.utils.NetworkResult

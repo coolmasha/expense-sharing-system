@@ -1,7 +1,7 @@
 package com.mashakulabukhova.expensesharingsystem.data.remote
 
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.FriendRequest
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.UserDto
+import com.mashakulabukhova.expensesharingsystem.data.model.request.FriendRequest
+import com.mashakulabukhova.expensesharingsystem.data.model.UserDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE

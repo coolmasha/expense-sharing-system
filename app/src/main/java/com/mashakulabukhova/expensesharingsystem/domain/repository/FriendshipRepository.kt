@@ -1,6 +1,6 @@
 package com.mashakulabukhova.expensesharingsystem.domain.repository
 
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.FriendRequest
+import com.mashakulabukhova.expensesharingsystem.data.model.request.FriendRequest
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.utils.NetworkResult
 

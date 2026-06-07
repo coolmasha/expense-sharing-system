@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.mashakulabukhova.expensesharingsystem.data.local.UserManager
 import com.mashakulabukhova.expensesharingsystem.domain.entity.User
 import com.mashakulabukhova.expensesharingsystem.presentation.component.ErrorMessage
 import com.mashakulabukhova.expensesharingsystem.presentation.component.LoadingIndicator
@@ -424,7 +425,9 @@ fun UserList(
             items = userList,
             key = { friend -> friend.id }
         ) { friend ->
-            UserCard(friend, onUserClick)
+            if (friend.id != UserManager.currentUser.id) {
+                UserCard(friend, onUserClick)
+            }
         }
     }
 }

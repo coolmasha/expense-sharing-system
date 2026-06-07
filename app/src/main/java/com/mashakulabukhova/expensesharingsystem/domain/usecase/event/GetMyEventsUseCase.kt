@@ -5,6 +5,16 @@ import com.mashakulabukhova.expensesharingsystem.domain.repository.EventReposito
 import com.mashakulabukhova.expensesharingsystem.utils.NetworkResult
 import javax.inject.Inject
 
+private val eventList1 = listOf(
+    Event(
+        id = "1",
+        title = "Конференция по Kotlin",
+        iconId = 76,
+        creatorId = "user_101",
+        isFinished = false
+    )
+)
+
 class GetMyEventsUseCase @Inject constructor(
     private val eventRepository: EventRepository
 ) {

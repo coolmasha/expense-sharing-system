@@ -1,7 +1,7 @@
 package com.mashakulabukhova.expensesharingsystem.data.remote
 
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.LoginRequest
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.RegistrationRequest
+import com.mashakulabukhova.expensesharingsystem.data.model.request.LoginRequest
+import com.mashakulabukhova.expensesharingsystem.data.model.request.RegistrationRequest
 import javax.inject.Inject
 
 class AuthenticationRemoteDataSource @Inject constructor(

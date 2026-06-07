@@ -1,9 +1,9 @@
 package com.mashakulabukhova.expensesharingsystem.data.remote
 
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.EventDto
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.UserDto
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.EventRequestDto
-import com.mashakulabukhova.expensesharingsystem.data.remote.model.request.ParticipantsRequestDto
+import com.mashakulabukhova.expensesharingsystem.data.model.EventDto
+import com.mashakulabukhova.expensesharingsystem.data.model.UserDto
+import com.mashakulabukhova.expensesharingsystem.data.model.request.EventRequestDto
+import com.mashakulabukhova.expensesharingsystem.data.model.request.ParticipantsRequestDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
